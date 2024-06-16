@@ -44,13 +44,28 @@ The result could look like this:
 ip.addr.of.wb	00:60:b5:XX:YY:ZZ	KEBA GmbH
 ```
 
-### setup dnsmasq
+### setup required tooling
+
+Port numbers are shifted by 55100, e.g.:
+
+BOOTP server: 55167
+BOOTP client: 55168
+TFTP server:  55169
+
+Tooling must be set up appropriately to handle this. In this example, 
+the apporach for Debian and related distributions is documented:
+
+* Install the packages "bootp" and "tftp-hpa".
+
+* Change the values in "/etc/services" for bootps, bootpc and tftp.
 
 Copy and rename the firmware appropriately. Example:
 
 ```code
 sudo cp kec_pdc-v.3.AA.BB.bin /var/lib/tftpboot/firmware.bin
 ```
+
+* Run the tools with these parameters: 
 
 ### send magic packet
 
