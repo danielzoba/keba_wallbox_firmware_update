@@ -30,3 +30,27 @@ for this packet can be found here: https://www.ti.com/lit/ug/spmu063/spmu063.pdf
 Once the magic packet is sent, the wallbox goes into firmware update mode. Details are described in the same
 document on page 368, chapter "29.1.3 Ethernet Update".
 
+### find out MAC address of wallbox
+
+Find out the MAC address of the wallbox. This example scans device "eth0".
+
+```code
+arp-scan -I eth0 -l
+```
+
+The result could look like this:
+
+```code
+ip.addr.of.wb	00:60:b5:XX:YY:ZZ	KEBA GmbH
+```
+
+### setup dnsmasq
+
+Copy and rename the firmware appropriately. Example:
+
+```code
+sudo cp kec_pdc-v.3.AA.BB.bin /var/lib/tftpboot/firmware.bin
+```
+
+### send magic packet
+
