@@ -46,7 +46,7 @@ ip.addr.of.wb	00:60:b5:XX:YY:ZZ	KEBA GmbH
 
 ### setup required tooling
 
-Port numbers are shifted by 55100, e.g.:
+Port numbers are shifted, probably due to privileges, by 55100, e.g.:
 
 BOOTP server: 55167
 BOOTP client: 55168
@@ -55,17 +55,38 @@ TFTP server:  55169
 Tooling must be set up appropriately to handle this. In this example, 
 the apporach for Debian and related distributions is documented:
 
-* Install the packages "bootp" and "tftp-hpa".
+* Install the packages "bootp" and "tftpd-hpa".
 
 * Change the values in "/etc/services" for bootps, bootpc and tftp.
 
 Copy and rename the firmware appropriately. Example:
 
 ```code
-sudo cp kec_pdc-v.3.AA.BB.bin /var/lib/tftpboot/firmware.bin
+mkdir -p /tftpboot
+sudo cp kec_pdc-v.3.AA.BB.bin /tftpboot/firmware.bin
 ```
+
+* add the IP address of your system to /etc/hosts with server name "stellaris". Example:
+
+192.168.100.1	stellaris
+
+* add the following line to /etc/bootptab (adjust IP as needed, fill in your MAC)
+
+.default:ip=192.168.100.50:bf=firmware.bin:ht=ethernet:ha=0060B5XXYYZZ
 
 * Run the tools with these parameters: 
 
+sudo bootpd -s -d 127 -h stellaris -c /tftpboot/
+
+(bootpd needs sudo for altering ARP table)
+
+in.tftpd -L --verbosity=127 --blocksize=516 -s --address 192.168.100.1:55169 /tftpboot/
+
 ### send magic packet
+
+Send 6 times "aa" and then repeat the MAC address of the wallbox 4 times:
+
+echo "aaaaaaaaaaaa0060b5XXYYZZ0060b5XXYYZZ0060b5XXYYZZ0060b5XXYYZZ" | xxd -r -p | nc -u ip.addr.of.wb 9
+
+This starts the firmware update process.
 
